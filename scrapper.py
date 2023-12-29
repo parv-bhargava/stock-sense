@@ -2,7 +2,7 @@ import yfinance as yf
 import pandas as pd
 def get_stock_data(ticker):
     stock = yf.Ticker(ticker)
-    return stock.history(period='max', interval='3mo', prepost=True, actions=True, auto_adjust=True, back_adjust=False)
+    return stock.history(period='max', interval='1d', prepost=True, actions=True, auto_adjust=True, back_adjust=False)
 
 def multi_stock_data(tickers, start, end):
     """
@@ -30,7 +30,7 @@ def multi_stock_data(tickers, start, end):
 
 #Apple stock data
 # AAPL: Invalid input - interval=3m is not supported. Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
-# pd.DataFrame(get_stock_data("AAPL")).to_csv("data/apple_quaterly_max.csv")
+pd.DataFrame(get_stock_data("AAPL")).to_csv("data/apple_one_day_max.csv")
 
 #Multi Stock Data
 # multi_stock_data(["AAPL", "MSFT", "GOOG"], "2019-01-01", "2020-01-01").to_csv("data/apple_msft_goog_2019.csv")
