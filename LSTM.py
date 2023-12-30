@@ -7,7 +7,7 @@ import numpy as np
 #%%[markdown]
 ## Data Import
 data=pd.read_csv("data/apple_one_day_max.csv")
-data= data[data['Date'] >= '2000-01-01']
+data= data[data['Date'] >= '2010-01-01']
 #%%
 # information about the data
 data.info()
@@ -152,12 +152,85 @@ def create_sequences(data, sequence_length):
     for i in range(len(data) - sequence_length):
         x.append(data[i:(i + sequence_length)]) ## This appends the previous 2 months
         y.append(data[i + sequence_length])  ## This appends the day after 2 months
+        x_combined = np.concatenate([x_sequence, x_prev_90, x_prev_91])
+        x.append(x_combined)
     return np.array(x), np.array(y)
 ## This method helps to basically make y predictions based on the previous 2 months
 sequence_length = 90
 X_train, y_train = create_sequences(train_data, sequence_length)
 #X_val, y_val = create_sequences(val_data, sequence_length)
 X_test, y_test = create_sequences(test_data, sequence_length)
+
+#%%
+# import datetime
+# import pandas as pd
+# import numpy as np
+
+# def df_to_windowed_df(dataframe, first_date_str, last_date_str, n=3):
+#     def str_to_datetime(date_str):
+#         return datetime.datetime.strptime(date_str, '%Y-%m-%d')
+    
+#     first_date = str_to_datetime(first_date_str)
+#     last_date = str_to_datetime(last_date_str)
+    
+#     target_date = first_date
+#     dates, X, Y = [], [], []
+    
+#     # Convert 'Date' column to datetime without time zone
+#     dataframe['Date'] = pd.to_datetime(dataframe['Date']).dt.tz_localize(None)
+
+#     while target_date <= last_date:
+#         df_subset = dataframe.loc[dataframe['Date'] <= target_date].tail(n + 1)
+
+#         if len(df_subset) != n + 1:
+#             print(f'Error: Window of size {n} is too large for date {target_date}')
+#             return
+
+#         values = df_subset['Close'].to_numpy()
+#         x, y = values[:-1], values[-1]
+
+#         dates.append(target_date)
+#         X.append(x)
+#         Y.append(y)
+
+#         next_date = target_date + datetime.timedelta(days=4)
+
+#         target_date = min(next_date, last_date)
+
+#     ret_df = pd.DataFrame({})
+#     ret_df['Target Date'] = dates
+
+#     X = np.array(X)
+    
+#     # Create three columns: 'Target', 'Target-1', and 'Target-2'
+#     ret_df['Target'] = Y
+#     ret_df['Target-1'] = X[:, 0]  # Assuming 'X[:, 0]' corresponds to the first day in the sequence
+#     ret_df['Target-2'] = X[:, 1]  # Assuming 'X[:, 1]' corresponds to the second day in the sequence
+
+#     return ret_df
+
+# # Example usage:
+# # Start day second time around: '2021-03-25'
+# windowed_df = df_to_windowed_df(merged_data, '2010-01-01', '2023-12-29', n=4)  # Increase n to 4 or any desired value
+# print(windowed_df)
+
+
+# #%%
+# def windowed_df_to_date_X_y(windowed_dataframe):
+#   df_as_np = windowed_dataframe.to_numpy()
+
+#   dates = df_as_np[:, 0]
+
+#   middle_matrix = df_as_np[:, 1:-1]
+#   X = middle_matrix.reshape((len(dates), middle_matrix.shape[1], 1))
+
+#   Y = df_as_np[:, -1]
+
+#   return dates, X.astype(np.float32), Y.astype(np.float32)
+
+# dates, X, y = windowed_df_to_date_X_y(windowed_df)
+
+# dates.shape, X.shape, y.shape
 
 # %%
 # Min max scaling
@@ -185,20 +258,10 @@ from tensorflow.keras.layers import Dropout
 
 # Build and train the LSTM model
 model = Sequential()
-model.add(LSTM(units=2000, return_sequences=True, input_shape=(X_train.shape[1], 1)))
-model.add(LSTM(units=700,return_sequences=True))
-model.add(LSTM(units=500,return_sequences=True))
-model.add(LSTM(units=200,return_sequences=True))
+model.add(LSTM(units=200, return_sequences=True, input_shape=(X_train.shape[1], 1)))
 model.add(LSTM(units=150,return_sequences=True))
 model.add(Dropout(0.2))
 model.add(LSTM(units=100,return_sequences=True))
-model.add(LSTM(units=50,return_sequences=True))
-model.add(LSTM(units=200,return_sequences=True))
-model.add(LSTM(units=150,return_sequences=True))
-model.add(LSTM(units=200,return_sequences=True))
-model.add(LSTM(units=150,return_sequences=True))
-model.add(LSTM(units=200,return_sequences=True))
-model.add(LSTM(units=150,return_sequences=True))
 model.add(LSTM(units=10))
 model.add(Dense(units=1,activation='linear'))
 
@@ -231,7 +294,7 @@ early_stopping = EarlyStopping(
 model.compile(optimizer=optimizer, loss='mean_squared_error')
 history = model.fit(
     X_train_scaled, y_train_scaled,
-    epochs=10, batch_size=100,
+    epochs=20, batch_size=7,
     validation_data=(X_test_scaled, y_test_scaled),
     callbacks=[model_checkpoint, early_stopping]
 )
@@ -262,7 +325,7 @@ plt.figure(figsize=(15, 6))
 
 # Plot training data
 plt.plot(train_data.index, train_data, label='Train Data', color='green')
-plt.plot(val_data.index, val_data, label='Validation Data', color='purple')
+#plt.plot(val_data.index, val_data, label='Validation Data', color='purple')
 
 # Plot actual values
 plt.plot(test_data.index, test_data, label='Actual', color='blue')
@@ -324,7 +387,7 @@ import numpy as np
 num_forecast_steps = 181  # Adjust this according to your needs
 
 # Determine the start date for the future forecast
-start_date = test_data.index[-1] - pd.Timedelta(days=179)  # Previous 90 days
+start_date = test_data.index[-1] - pd.Timedelta(days=129)  # Previous 90 days
 
 # Create sequences for future dates within the new date range
 future_dates = pd.date_range(start=start_date + pd.Timedelta(days=1), periods=num_forecast_steps, freq='B')
@@ -333,7 +396,7 @@ future_data = pd.Series(index=future_dates)
 
 # Create a Series with random values for the new date range
 np.random.seed(42)  # Set a seed for reproducibility
-future_data_values = np.random.uniform(low=130, high=200, size=num_forecast_steps)  # Adjust the range as needed
+future_data_values = np.random.uniform(low=192, high=200, size=num_forecast_steps)  # Adjust the range as needed
 future_data = pd.Series(data=future_data_values, index=future_dates)
 
 
@@ -354,6 +417,7 @@ future_predictions = scaler.inverse_transform(future_predictions_scaled.reshape(
 
 # Plot the predictions for the future
 plt.figure(figsize=(15, 6))
+#plt.plot(train_data.index, train_data, label='Train Data', color='green')
 
 # Plot actual values
 plt.plot(test_data.index, test_data, label='Actual', color='blue')
