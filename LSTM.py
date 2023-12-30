@@ -137,13 +137,13 @@ from tensorflow.keras.optimizers import Adam
 
 merged_data.set_index('Date', inplace=True)
 merged_data = merged_data.sort_index()
-train_size = int(len(merged_data) * 0.80)
+train_size = int(len(merged_data) * 0.95)
 
 
 
 # Split the data into training, validation, and test sets
-train_data, temp = train_test_split(merged_data['Close'], test_size=0.2, shuffle=False)
-val_data, test_data = train_test_split(temp, test_size=0.5, shuffle=False)
+train_data, test_data = train_test_split(merged_data['Close'], test_size=0.05, shuffle=False)
+#val_data, test_data = train_test_split(temp, test_size=0.5, shuffle=False)
 
 # %%
 # Create sequences for LSTM
@@ -156,7 +156,7 @@ def create_sequences(data, sequence_length):
 ## This method helps to basically make y predictions based on the previous 2 months
 sequence_length = 90
 X_train, y_train = create_sequences(train_data, sequence_length)
-X_val, y_val = create_sequences(val_data, sequence_length)
+#X_val, y_val = create_sequences(val_data, sequence_length)
 X_test, y_test = create_sequences(test_data, sequence_length)
 
 # %%
@@ -166,8 +166,8 @@ scaler = MinMaxScaler()
 X_train_scaled = scaler.fit_transform(X_train.reshape(-1, 1)).reshape(X_train.shape)
 y_train_scaled = scaler.fit_transform(y_train.reshape(-1, 1)).reshape(y_train.shape)
 
-X_val_scaled = scaler.transform(X_val.reshape(-1, 1)).reshape(X_val.shape)
-y_val_scaled = scaler.transform(y_val.reshape(-1, 1)).reshape(y_val.shape)
+#X_val_scaled = scaler.transform(X_val.reshape(-1, 1)).reshape(X_val.shape)
+#y_val_scaled = scaler.transform(y_val.reshape(-1, 1)).reshape(y_val.shape)
 
 X_test_scaled = scaler.transform(X_test.reshape(-1, 1)).reshape(X_test.shape)
 y_test_scaled = scaler.transform(y_test.reshape(-1, 1)).reshape(y_test.shape)
@@ -193,6 +193,12 @@ model.add(LSTM(units=150,return_sequences=True))
 model.add(Dropout(0.2))
 model.add(LSTM(units=100,return_sequences=True))
 model.add(LSTM(units=50,return_sequences=True))
+model.add(LSTM(units=200,return_sequences=True))
+model.add(LSTM(units=150,return_sequences=True))
+model.add(LSTM(units=200,return_sequences=True))
+model.add(LSTM(units=150,return_sequences=True))
+model.add(LSTM(units=200,return_sequences=True))
+model.add(LSTM(units=150,return_sequences=True))
 model.add(LSTM(units=10))
 model.add(Dense(units=1,activation='linear'))
 
@@ -226,7 +232,7 @@ model.compile(optimizer=optimizer, loss='mean_squared_error')
 history = model.fit(
     X_train_scaled, y_train_scaled,
     epochs=10, batch_size=100,
-    validation_data=(X_val_scaled, y_val_scaled),
+    validation_data=(X_test_scaled, y_test_scaled),
     callbacks=[model_checkpoint, early_stopping]
 )
 
@@ -315,22 +321,28 @@ plt.show()
 import numpy as np
 
 # Define the number of future time steps to forecast
-num_forecast_steps = 30  # Adjust this according to your needs
+num_forecast_steps = 181  # Adjust this according to your needs
 
-# Create sequences for future dates
-future_dates = pd.date_range(start=test_data.index[-1] + pd.Timedelta(days=0), periods=num_forecast_steps, freq='5B')
+# Determine the start date for the future forecast
+start_date = test_data.index[-1] - pd.Timedelta(days=179)  # Previous 90 days
+
+# Create sequences for future dates within the new date range
+future_dates = pd.date_range(start=start_date + pd.Timedelta(days=1), periods=num_forecast_steps, freq='B')
+
 future_data = pd.Series(index=future_dates)
 
-# Fill future_data with random values
+# Create a Series with random values for the new date range
 np.random.seed(42)  # Set a seed for reproducibility
-future_data_values = np.random.uniform(low=450, high=600, size=num_forecast_steps)  # Adjust the range as needed
+future_data_values = np.random.uniform(low=130, high=200, size=num_forecast_steps)  # Adjust the range as needed
 future_data = pd.Series(data=future_data_values, index=future_dates)
+
 
 # Print the filled future_data
 print(future_data)
 
+
 #%%
-# Create sequences for the future data
+
 X_future, _ = create_sequences(future_data, sequence_length)
 
 # Min-max scaling for the future data
@@ -361,3 +373,5 @@ plt.show()
 #%%
 pd.DataFrame(future_predictions,columns=['Closing Price'],index=future_data.index[sequence_length:])
 
+
+# %%
