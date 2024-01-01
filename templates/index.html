@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Stock Sense - Stock Price Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Stock Sense</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="content">
+            <form id="predictionForm">
+                <input type="number" id="Number of Days" placeholder="Number of Days">
+                <input type="submit" value="Predict">
+            </form>
+            <div id="prediction"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').onsubmit = function(event) {
+            event.preventDefault();
+
+            // Fetch prediction from Flask
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    // Replace with actual data fields
+                    features: [parseFloat(document.getElementById('feature1').value)]
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('prediction').innerHTML = 'Prediction: ' + data.prediction;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        };
+    </script>
+</body>
+</html>
