@@ -145,22 +145,19 @@ train_size = int(len(merged_data) * 0.95)
 train_data, test_data = train_test_split(merged_data['Close'], test_size=0.05, shuffle=False)
 #val_data, test_data = train_test_split(temp, test_size=0.5, shuffle=False)
 
-# %%
+#%%
 # Create sequences for LSTM
 def create_sequences(data, sequence_length):
     x, y = [], []
     for i in range(len(data) - sequence_length):
-        x.append(data[i:(i + sequence_length)]) ## This appends the previous 2 months
-        y.append(data[i + sequence_length])  ## This appends the day after 2 months
-        x_combined = np.concatenate([x_sequence, x_prev_90, x_prev_91])
-        x.append(x_combined)
+        x.append(data[i:(i + sequence_length)])
+        y.append(data[i + sequence_length])
     return np.array(x), np.array(y)
-## This method helps to basically make y predictions based on the previous 2 months
-sequence_length = 90
+
+sequence_length = 1
 X_train, y_train = create_sequences(train_data, sequence_length)
 #X_val, y_val = create_sequences(val_data, sequence_length)
 X_test, y_test = create_sequences(test_data, sequence_length)
-
 #%%
 # import datetime
 # import pandas as pd
@@ -285,7 +282,7 @@ model_checkpoint = ModelCheckpoint(
 # Define EarlyStopping callback
 early_stopping = EarlyStopping(
     monitor='val_loss',  
-    patience=2,  
+    patience=5,  
     restore_best_weights=True,
     verbose=1
 )
@@ -294,7 +291,7 @@ early_stopping = EarlyStopping(
 model.compile(optimizer=optimizer, loss='mean_squared_error')
 history = model.fit(
     X_train_scaled, y_train_scaled,
-    epochs=20, batch_size=7,
+    epochs=50, batch_size=7,
     validation_data=(X_test_scaled, y_test_scaled),
     callbacks=[model_checkpoint, early_stopping]
 )
@@ -387,7 +384,7 @@ import numpy as np
 num_forecast_steps = 181  # Adjust this according to your needs
 
 # Determine the start date for the future forecast
-start_date = test_data.index[-1] - pd.Timedelta(days=129)  # Previous 90 days
+start_date = test_data.index[-1] - pd.Timedelta(days=0)  # Previous 90 days
 
 # Create sequences for future dates within the new date range
 future_dates = pd.date_range(start=start_date + pd.Timedelta(days=1), periods=num_forecast_steps, freq='B')
