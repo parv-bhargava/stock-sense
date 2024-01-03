@@ -33,7 +33,7 @@ def predict():
         graph_image_path = create_graph(future_predictions)
         return render_template('index.html',
                                prediction=f'Price after {days} days is {float(last_day_value).__round__(2)}',
-                               graph_path={graph_image_path})
+                               graph_path=graph_image_path)
 
     return render_template('index.html')
 
