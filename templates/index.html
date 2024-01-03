@@ -3,6 +3,128 @@
 <head>
     <title>Stock Sense - Stock Price Prediction</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #4722228e;
+            background-image: url('/Users/richikghosh/Documents/GitHub/StockSense/background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1em 0;
+            border-bottom: 2px solid #fff; 
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            border: 2px solid #ccc; 
+            border-radius: 10px;
+            overflow: hidden; 
+            border: none;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .content {
+            background-color: #768fbd;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ccc; 
+            padding-bottom: 10px; 
+            margin-bottom: 20px; 
+        }
+
+        input[type="number"] {
+            width: 40%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        
+        input[type="button"]:hover {
+            background-color: #021701; 
+        }
+
+        input[type="button"] {
+            background-color: #08470a;
+            color: #fafafa;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        #graphPlaceholder {
+            display: none; 
+            margin-top: 20px;
+            border: 2px solid #db8a34; 
+            border-radius: 8px; 
+            padding: 10px; 
+        }
+
+        #stockGraph {
+            width: 70%; 
+        }
+
+        #prediction {
+            display: none; 
+            margin-top: 20px;
+            font-size: 18px;
+            color: #421e1e;
+            border: 2px solid #ccc; 
+            border-radius: 5px; 
+            padding: 10px;
+            width: 50%;
+            margin-left: auto; 
+            margin-right: auto;  
+        }
+
+        #moreButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            color: #fafafa;
+            padding: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        #moreButton:hover {
+            background-color: #021701;
+        }
+
+        #moreSection {
+            display: none;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -14,11 +136,59 @@
 <div class="container">
     <div class="content">
         <form id="predictionForm">
-            <input type="number" id="Number of Days" placeholder="Number of Days">
-            <input type="submit" value="Predict">
+            <input type="number" id="numberOfDays" name="numberOfDays" placeholder="Number of Days" min="0">
+            <input type="button" value="Predict" onclick="showGraph()">
         </form>
-        <div id="prediction"></div>
+        <div id="graphPlaceholder">
+            <!-- Placeholder for the graph -->
+            <canvas id="stockGraph" width="400" height="200"></canvas>
+        </div>
+        <div id="prediction">
+            <!-- Placeholder for the output value -->
+        </div>
+    </div>
+    <button id="moreButton" onclick="showMore()">≡</button>
+    <div id="moreSection">
+        <!-- Description of the website -->
+        Stock Sense is a website dedicated to predicting stock prices. Develop a user-friendly stock price prediction website that leverages advanced machine learning algorithms to analyze historical data, market trends, and relevant financial indicators. The website should provide accurate and real-time predictions for a diverse range of stocks, offering users valuable insights to make informed investment decisions. Incorporated interactive charts for user user-friendly environment.
     </div>
 </div>
+
+<script>
+    function showGraph() {
+        var numberOfDaysInput = document.getElementById("numberOfDays");
+        var numberOfDays = parseInt(numberOfDaysInput.value);
+
+        // Check if the number of days is not negative
+        if (numberOfDays >= 0) {
+            var graphPlaceholder = document.getElementById("graphPlaceholder");
+            graphPlaceholder.style.display = "block";
+
+            var predictionDiv = document.getElementById("prediction");
+            predictionDiv.style.display = "block";
+
+            var canvas = document.getElementById("stockGraph");
+            var context = canvas.getContext("2d");
+
+            // Example: Draw a simple line on the canvas as a placeholder
+            context.beginPath();
+            context.moveTo(10, 10);
+            context.lineTo(390, 190);
+            context.stroke();
+
+            // Example: Display a predicted result
+            var predictedResult = "Predicted Result: $700.50"; 
+            predictionDiv.innerHTML = predictedResult;
+        } else {
+            alert("Number of days cannot be negative.");
+        }
+    }
+
+    function showMore() {
+        var moreSection = document.getElementById("moreSection");
+        moreSection.style.display = "block";
+    }
+</script>
+
 </body>
 </html>
