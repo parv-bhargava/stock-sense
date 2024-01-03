@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockSense</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>Stock Sense</h1>
+    </div>
+</header>
+
+<div class="container">
+    <div class="content">
+        <form action="/predict" method="post">
+            <label for="days">Number of Days:</label>
+            <input type="number" id="days" name="days" required>
+            <button type="submit">Predict</button>
+        </form>
+
+        <!-- Area to display prediction and graph -->
+        <div id="prediction-result">
+            {% if prediction %}
+                <h2>Prediction: {{ prediction }}</h2>
+            {% endif %}
+            {% if graph_path %}
+                <img src="{{ graph_path }}" alt="Prediction Graph">
+            {% endif %}
+        </div>
+    </div>
+    <button id="moreButton" onclick="showMore()">≡</button>
+    <div id="moreSection">
+        Stock Sense is a website dedicated to predicting stock prices...
+    </div>
+</div>
+</body>
+</html>
