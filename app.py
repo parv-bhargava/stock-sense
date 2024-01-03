@@ -1,7 +1,6 @@
 import pandas as pd
 from flask import Flask, request, render_template
-from predict import predict
-from stock import get_stock_data
+from predict import predict_price, create_graph
 
 app = Flask(__name__)
 
@@ -18,13 +17,10 @@ def predict():
         stock_name = 'MSFT'
         # stock_name = request.form['stock_name']
         # Get the number of days from the POST request.
-        days = int(request.form['Number of Days'])
-
-        # Get the stock data from Yahoo Finance API.
-        stock_data = get_stock_data(days, stock_name)
+        days = int(request.form['days'])
 
         # Make predictions using the model.
-        future_predictions = predict(days, stock_name)
+        future_predictions, stock_data = predict_price(days, stock_name)
 
         # Get the next day's date.
         next_day = stock_data.index[-1] + pd.DateOffset(days=1)
@@ -33,8 +29,11 @@ def predict():
         output = {}
         output['future_predictions'] = future_predictions.flatten().tolist()
         output['dates'] = pd.date_range(start=next_day, periods=days + 1).strftime('%Y-%m-%d').tolist()
-        print(output)
-        return render_template('index.html', output=output)
+        last_day_value = output['future_predictions'][-1]
+        graph_image_path = create_graph(future_predictions)
+        return render_template('index.html',
+                               prediction=f'Price after {days} days is {float(last_day_value).__round__(2)}',
+                               graph_path={graph_image_path})
 
     return render_template('index.html')
 

@@ -1,16 +1,17 @@
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import load_model
+from matplotlib import pyplot as plt
 from stock import get_stock_data, create_sequences, preprocess_data, reverse_preprocess_data
 
 model = load_model('best_model.h5')
 scaler = MinMaxScaler()
 
-def predict(days, stock_name):
+def predict_price(days, stock_name):
     """
     Predicts the stock price for the next number of days using the trained LSTM model.
     :param days: Number of days to predict the stock price for.
     :param stock_name: The ticker symbol of the stock.
-    :return: A numpy array of the predicted stock prices.
+    :returns: A numpy array of the predicted stock prices and the stock data.
     """
 
     # Get the stock data from Yahoo Finance API.
@@ -28,4 +29,31 @@ def predict(days, stock_name):
     # Reverse the preprocessing.
     future_predictions = reverse_preprocess_data(future_predictions_scaled, scaler)
 
-    return future_predictions
+    return future_predictions, stock_data
+
+def create_graph(predictions):
+    """
+    Generates a graph from the prediction data and saves it as an image.
+
+    :param predictions: Array of predicted stock prices.
+    :return: returns Path to the saved graph image.
+    """
+    # Generating the graph
+    plt.figure(figsize=(10, 6))
+    plt.plot(predictions, color='blue', marker='o', linestyle='dashed', linewidth=2, markersize=6)
+    plt.title('Stock Price Predictions')
+    plt.xlabel('Days')
+    plt.ylabel('Predicted Price')
+    plt.grid(True)
+
+    # Saving the graph as an image
+    graph_image_path = 'static/data/stock_predictions_graph.png'
+    plt.savefig(graph_image_path)
+
+    # Returning the path for use in Flask app
+    return graph_image_path
+
+# if __name__ == '__main__':
+#     predictions = predict_price(30, 'MSFT')
+#     print(predictions)
+#     create_graph(predictions)
