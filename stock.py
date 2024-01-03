@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
-
-import numpy as np
-import pandas as pd
 import yfinance as yf
-
+from datetime import datetime, timedelta
+import pandas as pd
+import numpy as np
 
 def get_stock_data(days, stock_name):
     """
@@ -23,7 +21,6 @@ def get_stock_data(days, stock_name):
     close_prices = pd.Series(df['Close'].values, index=df.index)
 
     return close_prices
-
 
 # Create sequences for LSTM
 def create_sequences(data, sequence_length):
@@ -53,8 +50,6 @@ def preprocess_data(data, scaler):
     scaled_data = scaler.fit_transform(data)
 
     return scaled_data
-
-
 def reverse_preprocess_data(scaled_data, scaler):
     """
     Reverses the preprocessing by using the inverse transformation of MinMaxScaler.
@@ -65,6 +60,7 @@ def reverse_preprocess_data(scaled_data, scaler):
     """
     original_data = scaler.inverse_transform(scaled_data)
     return original_data
+
 
 # if __name__ == '__main__':
 #     stock_data = get_stock_data(30, 'MSFT')

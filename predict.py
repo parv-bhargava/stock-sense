@@ -1,10 +1,12 @@
+from matplotlib import pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import load_model
-from matplotlib import pyplot as plt
+
 from stock import get_stock_data, create_sequences, preprocess_data, reverse_preprocess_data
 
 model = load_model('best_model.h5')
 scaler = MinMaxScaler()
+
 
 def predict_price(days, stock_name):
     """
@@ -31,10 +33,10 @@ def predict_price(days, stock_name):
 
     return future_predictions, stock_data
 
+
 def create_graph(predictions):
     """
     Generates a graph from the prediction data and saves it as an image.
-
     :param predictions: Array of predicted stock prices.
     :return: returns Path to the saved graph image.
     """
@@ -50,7 +52,6 @@ def create_graph(predictions):
     graph_image_path = 'static/data/stock_predictions_graph.png'
     plt.savefig(graph_image_path)
 
-    # Returning the path for use in Flask app
     return graph_image_path
 
 # if __name__ == '__main__':
