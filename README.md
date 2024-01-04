@@ -49,7 +49,7 @@ The preprocessed data undergoes input to an LSTM network comprised of four layer
 Here is the forecasting of Apple stock that we have conducted.
 
 <p align="center">
-<img src="Forcasting.png" width="400" height="350" title="Apple stock" alt="Forcasting of apple stock">
+<img src="static/Forcasting.png" width="400" height="350" title="Apple stock" alt="Forcasting of apple stock">
 </p>
 
 ## Deployment:
