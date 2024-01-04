@@ -11,7 +11,8 @@ We use sentiment analysis to gauge the market mood and make predictions based on
 
 ## Data Collection
 
-The data has been collected from **Yahoo Finance**. The data consists of some core features which are:
+The data has been collected from **Yahoo Finance**. This data is the whole historic data that dates back to the start of the stock. The data consists of some core features which are:
+
   1. **Date**
      - The date associated with the stock market data.
   
@@ -48,5 +49,9 @@ The preprocessed data undergoes input to an LSTM network comprised of four layer
 Here is the forecasting of Apple stock that we have conducted.
 
 <p align="center">
-<img src="Forcasting.png" width="400" height="350" title="StockSense" alt="StockSense Logo">
+<img src="Forcasting.png" width="400" height="350" title="Apple stock" alt="Forcasting of apple stock">
 </p>
+
+## Deployment:
+
+The Stock Sense platform is launched as a website with a user-friendly design. Utilizing Flask and the accessibility features of AWS, our platform presents a responsive interface. This facilitates seamless navigation through input forms, allowing users to obtain precise predictions for their final stock price, accompanied by a graphical representation.
